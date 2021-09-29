@@ -5,5 +5,5 @@ import io.reactivex.Single
 
 interface RemoteSearchRepository {
 
-    fun getNasaImageModelList() : Single<List<NASAImageModel>>
+    fun getNasaImageModelList(query: String) : Single<List<NASAImageModel>>
 }

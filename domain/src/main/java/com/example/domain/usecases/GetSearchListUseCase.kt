@@ -6,10 +6,10 @@ import io.reactivex.Single
 import javax.inject.Inject
 
 class GetSearchListUseCase @Inject constructor(private val apiRepo: RemoteSearchRepository):
-    SingleUseCase<List<NASAImageModel>> {
+    SingleUseCase<List<NASAImageModel>, String> {
 
-    override fun execute(): Single<List<NASAImageModel>> {
-        return apiRepo.getNasaImageModelList()
+    override fun execute(query: String): Single<List<NASAImageModel>> {
+        return apiRepo.getNasaImageModelList(query)
     }
 
 }

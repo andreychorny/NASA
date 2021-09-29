@@ -10,6 +10,8 @@ fun SearchResponse.asDomainModel(): List<NASAImageModel>{
 
 fun ItemResponse.asDomainModel(): NASAImageModel{
     val firstDataEntry = data[0]
-    return NASAImageModel(firstDataEntry.title, firstDataEntry.description,
-        firstDataEntry.dateCreated, links[0].href)
+    return NASAImageModel(nasaId = firstDataEntry.nasa_id, title = firstDataEntry.title,
+        description = firstDataEntry.description,
+        dateCreated = firstDataEntry.dateCreated,
+        imageUrl = links[0].href)
 }

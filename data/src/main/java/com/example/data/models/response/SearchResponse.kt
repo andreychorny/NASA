@@ -8,7 +8,7 @@ data class SearchResponse (
 
 data class CollectionResponse(
     val items: List<ItemResponse>,
-    @Json(name = "links") val nextPageLink: List<CollectionLinkResponse>
+    @Json(name = "links") val nextPageLink: List<CollectionLinkResponse>?
 )
 
 data class ItemResponse(
@@ -17,6 +17,7 @@ data class ItemResponse(
 )
 
 data class DataResponse(
+    val nasa_id: String,
     val title: String,
     @Json(name = "date_created") val dateCreated: String,
     val description: String,
