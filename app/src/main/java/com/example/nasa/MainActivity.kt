@@ -7,9 +7,8 @@ import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import com.example.domain.models.NASAImageModel
 import com.example.nasa.databinding.ActivityMainBinding
-import com.example.nasa.ui.MainPageFragment
-import com.example.nasa.ui.NASADetailsFragment
-import com.example.nasa.ui.SearchResultFragment
+import com.example.nasa.ui.*
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -18,10 +17,22 @@ class MainActivity @Inject constructor() : AppCompatActivity(), Navigator {
 
     private lateinit var binding: ActivityMainBinding
 
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = FirebaseAuth.getInstance()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.materialToolbar.setOnMenuItemClickListener{ menuItem ->
+            when(menuItem.itemId){
+                R.id.profile ->{
+                    goToAuthenticationScreen()
+                    true
+                }
+                else -> false
+            }
+        }
         supportFragmentManager
             .beginTransaction()
             .add(R.id.fragmentContainer, MainPageFragment.newInstance())
@@ -50,6 +61,18 @@ class MainActivity @Inject constructor() : AppCompatActivity(), Navigator {
 
     override fun goToDetailsPage(model: NASAImageModel) {
         launchFragment(NASADetailsFragment.newInstance(model))
+    }
+
+    override fun goToAuthenticationScreen() {
+        if(auth.currentUser != null){
+            goToProfileScreen()
+        }else {
+            launchFragment(AuthenticationFragment.newInstance())
+        }
+    }
+
+    override fun goToProfileScreen() {
+        launchFragment(ProfileFragment.newInstance())
     }
 
 }

@@ -16,4 +16,8 @@ interface Navigator {
     fun goToSearchResult(query: String)
 
     fun goToDetailsPage(model: NASAImageModel)
+
+    fun goToAuthenticationScreen()
+
+    fun goToProfileScreen()
 }
