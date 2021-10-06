@@ -7,6 +7,10 @@ fun Fragment.navigator(): Navigator{
     return requireActivity() as Navigator
 }
 
+interface BaseFragmentNavigator<R: Navigator>{
+    fun provideNavigator(): R
+}
+
 interface Navigator {
 
     fun goBack()

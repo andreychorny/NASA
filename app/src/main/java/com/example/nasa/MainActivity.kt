@@ -19,6 +19,10 @@ class MainActivity @Inject constructor() : AppCompatActivity(), Navigator {
 
     private lateinit var auth: FirebaseAuth
 
+    //TODO firebase functions
+    //TODO rxjava backpressure
+    //TODO rxjava subject
+    //TODO workmanager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = FirebaseAuth.getInstance()

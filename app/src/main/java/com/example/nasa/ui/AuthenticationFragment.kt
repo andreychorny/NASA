@@ -9,9 +9,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.domain.models.User
 import com.example.nasa.databinding.FragmentAuthenticationBinding
 import com.example.nasa.navigator
+import com.example.nasa.viewmodel.AuthenticationViewModel
+import com.example.nasa.viewmodel.SearchResultViewModel
+import com.example.nasa.viewstate.AuthenticationViewState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
@@ -20,11 +24,10 @@ class AuthenticationFragment: Fragment() {
 
     private lateinit var binding: FragmentAuthenticationBinding
 
-    private lateinit var auth: FirebaseAuth
+    private val viewModel by viewModels<AuthenticationViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        auth = FirebaseAuth.getInstance()
     }
 
     override fun onCreateView(
@@ -33,104 +36,88 @@ class AuthenticationFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentAuthenticationBinding.inflate(inflater, container, false)
-        binding.tvRegister.setOnClickListener{
-            showRegisterScreen()
-        }
-        binding.tvSignIp.setOnClickListener{
-            showLoginScreen()
-        }
-        binding.btnSignIn.setOnClickListener{
-            signInUser()
-        }
-        binding.btnSignUp.setOnClickListener {
-            createNewAccount()
+        setupButtons()
+        viewModel.authenticationState().observe(viewLifecycleOwner){ state ->
+            when (state){
+                AuthenticationViewState.Loading -> {
+
+                }
+                AuthenticationViewState.Success -> {
+                    this.navigator().goBack()
+                }
+                is AuthenticationViewState.Error ->{
+                    Toast.makeText(context, state.message,
+                        Toast.LENGTH_SHORT).show()
+                }
+
+            }
         }
         showLoginScreen()
         return binding.root
     }
 
-    private fun signInUser(){
-        val email = binding.etEmail.text.toString()
-        val password = binding.etPassword.text.toString()
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    this.navigator().goBack()
-                } else {
-                    Toast.makeText(context, "Authentication failed.",
-                        Toast.LENGTH_SHORT).show()
-                }
+    private fun setupButtons() {
+        binding.tvRegister.setOnClickListener {
+            showRegisterScreen()
+        }
+        binding.tvSignIp.setOnClickListener {
+            showLoginScreen()
+        }
+        binding.btnSignIn.setOnClickListener {
+            viewModel.signInUser(
+                email = binding.etEmail.text.toString(),
+                password = binding.etPassword.text.toString()
+            )
+        }
+        binding.btnSignUp.setOnClickListener {
+            val nickname = binding.etNickname.text.toString()
+            val email = binding.etEmail.text.toString()
+            val password = binding.etPassword.text.toString()
+            val repeatedPassword = binding.etRepeatPassword.text.toString()
+            if (validateInput(nickname, email, password, repeatedPassword)) {
+                viewModel.createNewAccount(
+                    nickname = nickname,
+                    email = email,
+                    password = password,
+                )
             }
+        }
     }
 
-    private fun createNewAccount(){
-        val nickname = binding.etNickname.text.toString()
-        val email = binding.etEmail.text.toString()
-        val password = binding.etPassword.text.toString()
-        val repeatedPassword = binding.etRepeatPassword.text.toString()
-        if (validateWrongInput(nickname, email, password, repeatedPassword)) return
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val user = User(nickname, email)
-                    FirebaseAuth.getInstance().currentUser?.let {
-                        createUserEntryInDatabase(it, user)
-                    }
-                    this.navigator().goBack()
-                }else{
-                    Toast.makeText(context, "Sign-Up error occurred", Toast.LENGTH_SHORT).show()
-                    Log.e("AuthenticationFragment:", task.exception?.message?: "")
-                }
-            }
-    }
 
-    private fun validateWrongInput(
+    private fun validateInput(
         nickname: String,
         email: String,
         password: String,
         repeatedPassword: String
     ): Boolean {
         if (nickname.length < 6) {
-            binding.etNickname.setError("Nickname is too short")
+            binding.etNickname.error = "Nickname is too short"
             binding.etNickname.requestFocus()
-            return true
+            return false
         }
         if (!nickname.lowercase().contains(CONTAINS_LETTERS_REGEX)) {
             binding.etNickname.error = "Nickname must contain letters"
             binding.etNickname.requestFocus()
-            return true
+            return false
         }
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             binding.etEmail.error = "Please provide valid email"
             binding.etEmail.requestFocus()
-            return true
+            return false
         }
         if (password.length < 6) {
             binding.etPassword.error = "Password should have more than 6 symbols"
             binding.etPassword.requestFocus()
-            return true
+            return false
         }
         if (repeatedPassword != password) {
             binding.etRepeatPassword.error = "Passwords must match"
             binding.etRepeatPassword.requestFocus()
-            return true
+            return false
         }
-        return false
+        return true
     }
-
-    private fun createUserEntryInDatabase(
-        it: FirebaseUser,
-        user: User
-    ) = FirebaseDatabase.getInstance().getReference("users")
-        .child(it.uid)
-        .setValue(user).addOnCompleteListener {
-            if (it.isSuccessful) {
-                Toast.makeText(context, "New account was created", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(context, "Sign-Up error occurred", Toast.LENGTH_SHORT).show()
-                Log.e("AuthenticationFragment:", it.exception?.message?: "")
-            }
-        }
 
     private fun showLoginScreen(){
         binding.btnSignIn.isVisible = true

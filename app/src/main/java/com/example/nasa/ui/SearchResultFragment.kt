@@ -82,6 +82,7 @@ class SearchResultFragment: Fragment() {
         binding.nasaSearchRecyclerView.adapter = adapter
         val manager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         manager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
+        manager.isItemPrefetchEnabled = true
         binding.nasaSearchRecyclerView.layoutManager = manager
     }
 

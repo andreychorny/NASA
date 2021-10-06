@@ -21,13 +21,15 @@ class SearchResultViewModel @Inject constructor(
     fun searchResult(): LiveData<SearchResultViewState> = searchResult
 
     fun makeSearch(query: String) {
-        searchResult.postValue(SearchResultViewState.Loading)
+        searchResult.value = SearchResultViewState.Loading
+        //TODO disposable
         searchListUseCase.execute(query)
             .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
             .subscribe({
-                searchResult.postValue(SearchResultViewState.Data(it))
+                searchResult.value = SearchResultViewState.Data(it)
             }, {
-                searchResult.postValue(SearchResultViewState.Error("Network error has occured"))
+                searchResult.value = SearchResultViewState.Error("Network error has occurred")
             })
     }
 }

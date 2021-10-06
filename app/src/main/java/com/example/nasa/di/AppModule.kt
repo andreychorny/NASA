@@ -4,8 +4,10 @@ import com.example.data.repository.RemoteSearchRepositoryImpl
 import com.example.domain.repositories.RemoteSearchRepository
 import com.example.nasa.rx.SchedulersFacade
 import com.example.nasa.rx.SchedulersProvider
+import com.google.firebase.auth.FirebaseAuth
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
