@@ -3,8 +3,7 @@ package com.example.nasa.adapter
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import com.example.domain.models.NASAImageModel
+import com.example.domain.models.backend.NASAImageModel
 import com.example.nasa.adapter.search.NASAImageViewHolder
 
 class SearchAdapter(val onItemClicked : (model: NASAImageModel) -> Unit) : ListAdapter<NASAImageModel, NASAImageViewHolder>((NASADiffUtil())) {

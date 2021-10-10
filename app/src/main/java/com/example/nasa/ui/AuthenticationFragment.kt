@@ -1,7 +1,6 @@
 package com.example.nasa.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
@@ -10,15 +9,10 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.domain.models.User
 import com.example.nasa.databinding.FragmentAuthenticationBinding
 import com.example.nasa.navigator
 import com.example.nasa.viewmodel.AuthenticationViewModel
-import com.example.nasa.viewmodel.SearchResultViewModel
 import com.example.nasa.viewstate.AuthenticationViewState
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.FirebaseDatabase
 
 class AuthenticationFragment: Fragment() {
 

@@ -11,4 +11,7 @@
     <string name="sign_out">Sign-Out</string>
     <string name="profile">Profile</string>
     <string name="profile_nickname">Nickname:</string>
+    <string name="your_comment">Your comment:</string>
+    <string name="send">Send</string>
+    <string name="user_not_signed_alert">You need to be signed-in to leave comments!</string>
 </resources>

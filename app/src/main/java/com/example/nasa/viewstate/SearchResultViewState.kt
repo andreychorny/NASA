@@ -1,6 +1,6 @@
 package com.example.nasa.viewstate
 
-import com.example.domain.models.NASAImageModel
+import com.example.domain.models.backend.NASAImageModel
 
 sealed class SearchResultViewState {
 

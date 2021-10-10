@@ -1,6 +1,12 @@
 package com.example.data.di
 
 import com.example.data.apiservice.ApiService
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.ktx.storage
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -43,4 +49,12 @@ object NetworkModule {
         return retrofit.create(ApiService::class.java)
     }
 
+    @Provides
+    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+
+    @Provides
+    fun provideStorageReference(): StorageReference = Firebase.storage.reference
+
+    @Provides
+    fun provideDatabaseReference(): DatabaseReference = Firebase.database.reference
 }

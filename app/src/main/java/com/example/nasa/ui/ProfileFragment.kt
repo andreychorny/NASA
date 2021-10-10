@@ -1,8 +1,6 @@
 package com.example.nasa.ui
 
-import android.R.attr
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,31 +12,19 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import android.content.Intent
-import android.provider.MediaStore
-import android.app.Activity.RESULT_OK
 import androidx.activity.result.contract.ActivityResultContracts
-import android.R.attr.bitmap
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
-
-import android.os.Build
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
-import com.example.nasa.GlideApp
 import com.example.nasa.R
-import com.example.nasa.viewmodel.AuthenticationViewModel
 import com.example.nasa.viewmodel.ProfileViewModel
 import com.example.nasa.viewstate.ProfileViewState
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.ktx.storage
-import java.io.ByteArrayOutputStream
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class ProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileBinding
@@ -93,6 +79,11 @@ class ProfileFragment : Fragment() {
         setViewStatesProcessing()
         viewModel.loadCurrentUser(auth.uid!!)
         return binding.root
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.cancelAllDisposables()
     }
 
     private fun setViewStatesProcessing() {

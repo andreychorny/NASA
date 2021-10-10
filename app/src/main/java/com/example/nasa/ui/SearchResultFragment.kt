@@ -1,20 +1,18 @@
 package com.example.nasa.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.nasa.R
 import com.example.nasa.adapter.SearchAdapter
 import com.example.nasa.databinding.FragmentSearchResultBinding
 import com.example.nasa.viewmodel.SearchResultViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.example.domain.models.NASAImageModel
+import com.example.domain.models.backend.NASAImageModel
 import com.example.nasa.navigator
 import com.example.nasa.viewstate.SearchResultViewState
 
@@ -64,6 +62,11 @@ class SearchResultFragment: Fragment() {
         })
         viewModel.makeSearch(searchQuery)
         return binding.root
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.cancelAllDisposables()
     }
 
     private fun showData(state: SearchResultViewState.Data) {

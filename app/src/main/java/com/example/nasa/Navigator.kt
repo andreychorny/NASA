@@ -1,12 +1,13 @@
 package com.example.nasa
 
 import androidx.fragment.app.Fragment
-import com.example.domain.models.NASAImageModel
+import com.example.domain.models.backend.NASAImageModel
 
 fun Fragment.navigator(): Navigator{
     return requireActivity() as Navigator
 }
 
+//TODO refactor navigation by using this:
 interface BaseFragmentNavigator<R: Navigator>{
     fun provideNavigator(): R
 }

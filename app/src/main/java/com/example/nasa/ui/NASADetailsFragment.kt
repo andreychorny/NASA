@@ -5,23 +5,32 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
-import com.example.domain.models.NASAImageModel
+import com.example.domain.models.backend.NASAImageModel
+import com.example.nasa.adapter.commentsection.CommentsSectionAdapter
 import com.example.nasa.databinding.FragmentNasaDetailsBinding
+import com.example.nasa.viewmodel.NASADetailsViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
-class NASADetailsFragment: Fragment() {
+@AndroidEntryPoint
+class NASADetailsFragment : Fragment() {
 
     private lateinit var binding: FragmentNasaDetailsBinding
 
     private lateinit var nasaModel: NASAImageModel
 
+    private val viewModel by viewModels<NASADetailsViewModel>()
+
+    private var adapter: CommentsSectionAdapter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        nasaModel = savedInstanceState?.getParcelable(MODEL) ?:
-                arguments?.getParcelable(MODEL) ?:
-                throw IllegalArgumentException("You need to specify model to launch this fragment")
+        nasaModel = savedInstanceState?.getParcelable(MODEL) ?: arguments?.getParcelable(MODEL)
+                ?: throw IllegalArgumentException("You need to specify model to launch this fragment")
 
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -34,11 +43,32 @@ class NASADetailsFragment: Fragment() {
         binding.tvDetailTitle.text = nasaModel.title
         binding.tvDate.text = nasaModel.dateCreated
         binding.tvDescription.text = nasaModel.description
+        initRecyclerView()
+        viewModel.nasaComments().observe(viewLifecycleOwner) {
+            adapter?.submitList(it)
+        }
+        viewModel.loadComments(nasaModel.nasaId)
         return binding.root
     }
 
+    private fun initRecyclerView() {
+        adapter = CommentsSectionAdapter(onCommentPost)
+        binding.commentSectionRecyclerView.adapter = adapter
+
+    }
+
+    private val onCommentPost = { comment: String ->
+        viewModel.postComment(comment, nasaModel.nasaId)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.cancelAllDisposables()
+    }
+
     companion object {
-        @JvmStatic private val MODEL = "NASA_MODEL"
+        @JvmStatic
+        private val MODEL = "NASA_MODEL"
 
         fun newInstance(model: NASAImageModel): NASADetailsFragment {
             val args = Bundle()
