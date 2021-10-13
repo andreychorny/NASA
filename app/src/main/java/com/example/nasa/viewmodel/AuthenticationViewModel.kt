@@ -5,67 +5,69 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.domain.models.firebase.User
+import com.example.domain.payload.SignInRequest
+import com.example.domain.payload.SignUpRequest
+import com.example.domain.usecases.firebase.LoadCommentsUseCase
+import com.example.domain.usecases.firebase.PostNewCommentUseCase
+import com.example.domain.usecases.firebase.authentication.SignInUserUseCase
+import com.example.domain.usecases.firebase.authentication.SignUpUserUseCase
+import com.example.nasa.rx.SchedulersProvider
 import com.example.nasa.viewstate.AuthenticationViewState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthenticationViewModel @Inject constructor(
-) : ViewModel() {
+    private val signUpUserUseCase: SignUpUserUseCase,
+    private val signInUserUseCase: SignInUserUseCase,
+    private val schedulers: SchedulersProvider
 
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+) : ViewModel() {
 
     private val authenticationState = MutableLiveData<AuthenticationViewState>()
     fun authenticationState(): LiveData<AuthenticationViewState> = authenticationState
 
+    private val disposables = mutableListOf<Disposable>()
+
     fun signInUser(email: String, password: String) {
         authenticationState.value = AuthenticationViewState.Loading
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
+        disposables.add(
+            signInUserUseCase.execute(SignInRequest(email, password))
+                .subscribeOn(schedulers.io())
+                .observeOn(schedulers.ui())
+                .subscribe({
                     authenticationState.value = AuthenticationViewState.Success
-                } else {
+                }, {
                     authenticationState.value =
                         AuthenticationViewState.Error("Authentication failed.")
-                    Log.e("AuthenticationFragment", task.exception?.message ?: "")
-                }
-            }
+                    Log.e("AuthenticationFragment", it.message ?: "")
+                })
+        )
     }
 
     fun createNewAccount(nickname: String, email: String, password: String) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val user = User(nickname)
-                    FirebaseAuth.getInstance().currentUser?.let {
-                        createUserEntryInDatabase(it, user)
-                    }
-                    val profile = userProfileChangeRequest {
-                        displayName = nickname
-                    }
-                    FirebaseAuth.getInstance().currentUser?.updateProfile(profile)
+        disposables.add(
+            signUpUserUseCase.execute(SignUpRequest(nickname, email, password))
+                .subscribeOn(schedulers.io())
+                .observeOn(schedulers.ui())
+                .subscribe({
                     authenticationState.value = AuthenticationViewState.Success
-                } else {
+
+                }, {
                     authenticationState.value =
                         AuthenticationViewState.Error("Sign-Up error occurred")
-                    Log.e("AuthenticationFragment", task.exception?.message ?: "")
-                }
-            }
+
+                })
+        )
+
     }
 
-    private fun createUserEntryInDatabase(
-        it: FirebaseUser,
-        user: User
-    ) = FirebaseDatabase.getInstance().getReference("users")
-        .child(it.uid)
-        .setValue(user).addOnCompleteListener {
-            if (!it.isSuccessful) {
-                authenticationState.value = AuthenticationViewState.Error("Sign-Up error occurred")
-                Log.e("AuthenticationFragment", it.exception?.message ?: "")
-            }
-        }
+    fun cancelAllDisposables() {
+        disposables.forEach { it.dispose() }
+    }
 }

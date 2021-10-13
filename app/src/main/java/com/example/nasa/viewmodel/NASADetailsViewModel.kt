@@ -30,12 +30,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NASADetailsViewModel @Inject constructor(
-    val loadCommentsUseCase: LoadCommentsUseCase,
-    val postNewCommentUseCase: PostNewCommentUseCase,
+    private val loadCommentsUseCase: LoadCommentsUseCase,
+    private val postNewCommentUseCase: PostNewCommentUseCase,
     private val schedulers: SchedulersProvider
 ) : ViewModel() {
-
-    private val database = Firebase.database.reference
 
     private var nasaPostToCommentsModel: NASAPostCommentsModel? = null
 

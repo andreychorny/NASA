@@ -26,6 +26,7 @@ class FirebaseCommentRepositoryImpl @Inject constructor(
     val database: DatabaseReference
 ) : FirebaseCommentRepository {
 
+    //TODO consider retrieving Bitmap pic together with comment info
     override fun getComments(nasaId: String): Observable<NASAPostCommentsModel> =
         Observable.create { subscriber ->
             val nasaPostReference = database.child("nasaPostToComments").child(nasaId)
@@ -65,9 +66,17 @@ class FirebaseCommentRepositoryImpl @Inject constructor(
                 }.addOnFailureListener {
                     subscriber.onError(it)
                 }
-            }else{
+            } else {
                 subscriber.onError(Exception("User is not logged in to leave comments"))
             }
         }
+//        Way to store downloadUrl in User if needed after pushing img
+//        ref.putBytes(bytes).addOnCompleteListener { task1 ->
+//            if (task1.isSuccessful) {
+//                ref.downloadUrl.addOnCompleteListener { task2 ->
+//                    if (task2.isSuccessful) {
+//
+//                    }
+//                }
 
 }

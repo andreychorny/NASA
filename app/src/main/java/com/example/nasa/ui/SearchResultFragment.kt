@@ -67,7 +67,7 @@ class SearchResultFragment: Fragment() {
     override fun onStop() {
         super.onStop()
         viewModel.cancelAllDisposables()
-    }
+    } 
 
     private fun showData(state: SearchResultViewState.Data) {
         binding.loading.isVisible = false

@@ -29,7 +29,6 @@ class ProfileViewModel @Inject constructor(
     private val schedulers: SchedulersProvider
 ) : ViewModel() {
 
-
     private val profileState = MutableLiveData<ProfileViewState>()
     fun profileState(): LiveData<ProfileViewState> = profileState
 

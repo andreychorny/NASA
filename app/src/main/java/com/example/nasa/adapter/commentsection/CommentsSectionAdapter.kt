@@ -5,6 +5,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.domain.models.backend.NASAImageModel
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 
 private const val ITEM_TYPE_COMMENT = 1
 private const val ITEM_TYPE_COMMENT_INPUT = 2
@@ -13,9 +15,11 @@ private const val ITEM_TYPE_NO_SIGNED_USER_ALERT = 3
 class CommentsSectionAdapter(private val onCommentPost: (comment: String) -> Unit) :
     ListAdapter<CommentsSectionItem, RecyclerView.ViewHolder>(CommentsSectionDiffUtil()) {
 
+    private val storage = Firebase.storage.reference
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            ITEM_TYPE_COMMENT -> CommentViewHolder.from(parent)
+            ITEM_TYPE_COMMENT -> CommentViewHolder.from(parent, storage)
             ITEM_TYPE_COMMENT_INPUT -> CommentInputViewHolder.from(parent, onCommentPost)
             ITEM_TYPE_NO_SIGNED_USER_ALERT -> NoSignedUserAlertViewHolder.from(parent)
             else -> throw IllegalStateException()

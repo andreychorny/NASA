@@ -13,7 +13,9 @@ import com.example.nasa.databinding.FragmentAuthenticationBinding
 import com.example.nasa.navigator
 import com.example.nasa.viewmodel.AuthenticationViewModel
 import com.example.nasa.viewstate.AuthenticationViewState
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AuthenticationFragment: Fragment() {
 
     private lateinit var binding: FragmentAuthenticationBinding
@@ -48,6 +50,11 @@ class AuthenticationFragment: Fragment() {
         }
         showLoginScreen()
         return binding.root
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.cancelAllDisposables()
     }
 
     private fun setupButtons() {

@@ -1,8 +1,10 @@
 package com.example.nasa.di
 
+import com.example.data.repository.AuthenticationRepositoryImpl
 import com.example.data.repository.FirebaseCommentRepositoryImpl
 import com.example.data.repository.FirebaseUserRepositoryImpl
 import com.example.data.repository.RemoteSearchRepositoryImpl
+import com.example.domain.repositories.AuthenticationRepository
 import com.example.domain.repositories.FirebaseCommentRepository
 import com.example.domain.repositories.FirebaseUserRepository
 import com.example.domain.repositories.RemoteSearchRepository
@@ -30,5 +32,8 @@ abstract class AppModule {
 
     @Binds
     abstract fun provideFirebaseCommentRepository(impl: FirebaseCommentRepositoryImpl): FirebaseCommentRepository
+
+    @Binds
+    abstract fun provideAuthenticationRepository(impl: AuthenticationRepositoryImpl): AuthenticationRepository
 
 }
