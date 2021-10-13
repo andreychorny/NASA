@@ -9,6 +9,7 @@ import javax.inject.Inject
 class GetUserUseCase @Inject constructor(private val repo: FirebaseUserRepository):
     SingleUseCase<User, String> {
 
+    //input - user uid
     override fun execute(input: String): Single<User> {
         return  repo.getCurrentUserByUid(input)
     }

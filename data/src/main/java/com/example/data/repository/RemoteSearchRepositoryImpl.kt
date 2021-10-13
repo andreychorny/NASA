@@ -13,6 +13,10 @@ class RemoteSearchRepositoryImpl @Inject constructor(
     private val apiService: ApiService
 ): RemoteSearchRepository {
 
+    override fun getNasaModel(nasaId: String): Single<NASAImageModel> {
+        return apiService.getSearchResponse(nasaId).map { it.collection.items[0].asDomainModel() }
+    }
+
     override fun getNasaImageModelList(query: String): Single<List<NASAImageModel>> {
         return apiService.getSearchResponse(query).map { it.asDomainModel() }
     }

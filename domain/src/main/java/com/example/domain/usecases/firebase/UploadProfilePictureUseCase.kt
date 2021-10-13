@@ -9,6 +9,7 @@ import javax.inject.Inject
 class UploadProfilePictureUseCase @Inject constructor(private val repo: FirebaseUserRepository):
     SingleUseCase<Bitmap, Bitmap> {
 
+    //input - bitmap of an image
     override fun execute(input: Bitmap): Single<Bitmap> {
         return  repo.uploadProfilePicture(bitmap = input)
     }

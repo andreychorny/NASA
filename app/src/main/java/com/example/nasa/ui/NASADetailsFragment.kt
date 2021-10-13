@@ -12,13 +12,12 @@ import com.example.nasa.adapter.commentsection.CommentsSectionAdapter
 import com.example.nasa.databinding.FragmentNasaDetailsBinding
 import com.example.nasa.viewmodel.NASADetailsViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.IllegalArgumentException
 
 @AndroidEntryPoint
 class NASADetailsFragment : Fragment() {
 
     private lateinit var binding: FragmentNasaDetailsBinding
-
-    private lateinit var nasaModel: NASAImageModel
 
     private val viewModel by viewModels<NASADetailsViewModel>()
 
@@ -26,9 +25,13 @@ class NASADetailsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        nasaModel = savedInstanceState?.getParcelable(MODEL) ?: arguments?.getParcelable(MODEL)
-                ?: throw IllegalArgumentException("You need to specify model to launch this fragment")
-
+        val nasaModel: NASAImageModel? = savedInstanceState?.getParcelable(MODEL) ?: arguments?.getParcelable(MODEL)
+        nasaModel?.let { viewModel.setNasaModel(it) }
+        if(nasaModel == null) {
+            val nasaId = arguments?.getString(KEY) ?: throw IllegalArgumentException("You must provide " +
+                    "either a Nasa model or id to nasa model")
+            viewModel.loadNasaPost(nasaId)
+        }
     }
 
     override fun onCreateView(
@@ -37,17 +40,20 @@ class NASADetailsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentNasaDetailsBinding.inflate(inflater, container, false)
-        Glide.with(binding.nasaDetailImage.context)
-            .load(nasaModel.imageUrl)
-            .into(binding.nasaDetailImage)
-        binding.tvDetailTitle.text = nasaModel.title
-        binding.tvDate.text = nasaModel.dateCreated
-        binding.tvDescription.text = nasaModel.description
         initRecyclerView()
+        viewModel.nasaModel().observe(viewLifecycleOwner){ nasaModel ->
+            Glide.with(binding.nasaDetailImage.context)
+                .load(nasaModel?.imageUrl)
+                .into(binding.nasaDetailImage)
+            binding.tvDetailTitle.text = nasaModel?.title
+            binding.tvDate.text = nasaModel?.dateCreated
+            binding.tvDescription.text = nasaModel?.description
+
+            viewModel.loadComments(nasaModel.nasaId)
+        }
         viewModel.nasaComments().observe(viewLifecycleOwner) {
             adapter?.submitList(it)
         }
-        viewModel.loadComments(nasaModel.nasaId)
         return binding.root
     }
 
@@ -58,7 +64,7 @@ class NASADetailsFragment : Fragment() {
     }
 
     private val onCommentPost = { comment: String ->
-        viewModel.postComment(comment, nasaModel.nasaId)
+        viewModel.postComment(comment)
     }
 
     override fun onStop() {
@@ -69,6 +75,8 @@ class NASADetailsFragment : Fragment() {
     companion object {
         @JvmStatic
         private val MODEL = "NASA_MODEL"
+        @JvmStatic
+        private val KEY = "NASA_ID"
 
         fun newInstance(model: NASAImageModel): NASADetailsFragment {
             val args = Bundle()

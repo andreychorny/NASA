@@ -9,6 +9,7 @@ import javax.inject.Inject
 class GetSearchListUseCase @Inject constructor(private val apiRepo: RemoteSearchRepository):
     SingleUseCase<List<NASAImageModel>, String> {
 
+    //input - search query
     override fun execute(input: String): Single<List<NASAImageModel>> {
         return apiRepo.getNasaImageModelList(input)
     }

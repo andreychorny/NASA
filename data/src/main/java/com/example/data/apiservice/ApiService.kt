@@ -10,4 +10,7 @@ interface ApiService {
     @GET("/search?media_type=image")
     fun getSearchResponse(@Query("q")query: String): Single<SearchResponse>
 
+    @GET("/search?media_type=image")
+    fun getSingleItem(@Query("nasa_id")nasa_id: String): Single<SearchResponse>
+
 }

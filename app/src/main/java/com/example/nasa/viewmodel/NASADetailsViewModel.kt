@@ -5,9 +5,11 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.domain.models.backend.NASAImageModel
 import com.example.domain.models.firebase.Comment
 import com.example.domain.models.firebase.NASAPostCommentsModel
 import com.example.domain.payload.NewCommentRequest
+import com.example.domain.usecases.backend.GetSingleNasaItemUseCase
 import com.example.domain.usecases.firebase.LoadCommentsUseCase
 import com.example.domain.usecases.firebase.PostNewCommentUseCase
 import com.example.nasa.adapter.commentsection.CommentInputItem
@@ -24,6 +26,7 @@ import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.Disposable
+import java.lang.IllegalArgumentException
 import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
@@ -32,6 +35,7 @@ import javax.inject.Inject
 class NASADetailsViewModel @Inject constructor(
     private val loadCommentsUseCase: LoadCommentsUseCase,
     private val postNewCommentUseCase: PostNewCommentUseCase,
+    private val getSingleNasaItemUseCase: GetSingleNasaItemUseCase,
     private val schedulers: SchedulersProvider
 ) : ViewModel() {
 
@@ -40,7 +44,25 @@ class NASADetailsViewModel @Inject constructor(
     private val nasaComments = MutableLiveData<List<CommentsSectionItem>>()
     fun nasaComments(): LiveData<List<CommentsSectionItem>> = nasaComments
 
+    private val nasaModel = MutableLiveData<NASAImageModel>()
+    fun nasaModel(): LiveData<NASAImageModel> = nasaModel
+
     private val disposables = mutableListOf<Disposable>()
+
+    fun loadNasaPost(nasaId: String) {
+        disposables.add(getSingleNasaItemUseCase.execute(nasaId)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe({
+                nasaModel.value = it
+            },{
+                throw IllegalArgumentException("No such nasa id found")
+            }))
+    }
+
+    fun setNasaModel(model: NASAImageModel) {
+        nasaModel.value = model
+    }
 
     fun loadComments(nasaId: String) {
         if (Firebase.auth.currentUser != null) {
@@ -48,38 +70,42 @@ class NASADetailsViewModel @Inject constructor(
         } else {
             nasaComments.value = listOf(NoSignedUserAlertItem)
         }
-        disposables.add(loadCommentsUseCase.execute(nasaId)
-            .subscribeOn(schedulers.io())
-            .observeOn(schedulers.ui())
-            .subscribe({
-                val resultList = mutableListOf<CommentsSectionItem>()
-                if (Firebase.auth.currentUser != null) {
-                    resultList.add(CommentInputItem)
-                } else {
-                    resultList.add(NoSignedUserAlertItem)
-                }
-                nasaPostToCommentsModel = it
-                resultList.addAll(
-                    nasaPostToCommentsModel?.comments?.asCommentsSectionItem() ?: emptyList()
-                )
-                nasaComments.value = resultList
-            }, {
-                Log.e(TAG, it.message ?: "Loading of comments was unsuccessful")
-            })
+        disposables.add(
+            loadCommentsUseCase.execute(nasaId)
+                .subscribeOn(schedulers.io())
+                .observeOn(schedulers.ui())
+                .subscribe({
+                    val resultList = mutableListOf<CommentsSectionItem>()
+                    if (Firebase.auth.currentUser != null) {
+                        resultList.add(CommentInputItem)
+                    } else {
+                        resultList.add(NoSignedUserAlertItem)
+                    }
+                    nasaPostToCommentsModel = it
+                    resultList.addAll(
+                        nasaPostToCommentsModel?.comments?.asCommentsSectionItem() ?: emptyList()
+                    )
+                    nasaComments.value = resultList
+                }, {
+                    Log.e(TAG, it.message ?: "Loading of comments was unsuccessful")
+                })
         )
     }
 
-    fun postComment(comment: String, nasaId: String) {
+    fun postComment(comment: String) {
         val commentId = if (nasaPostToCommentsModel == null) {
             0
         } else {
             nasaPostToCommentsModel!!.comments?.size ?: 0
         }
-        val postCommentRequest = NewCommentRequest(commentId.toString(), nasaId, comment)
-        postNewCommentUseCase.execute(postCommentRequest)
-            .subscribeOn(schedulers.io())
-            .observeOn(schedulers.ui())
-            .subscribe()
+        nasaModel.value?.nasaId?.let { nasaId ->
+            val postCommentRequest =
+                NewCommentRequest(commentId.toString(), nasaId, comment)
+            disposables.add(postNewCommentUseCase.execute(postCommentRequest)
+                .subscribeOn(schedulers.io())
+                .observeOn(schedulers.ui())
+                .subscribe())
+        }
     }
 
     fun cancelAllDisposables() {
