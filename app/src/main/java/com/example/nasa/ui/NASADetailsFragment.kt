@@ -4,10 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.example.domain.models.backend.NASAImageModel
+import com.example.nasa.R
 import com.example.nasa.adapter.commentsection.CommentsSectionAdapter
 import com.example.nasa.databinding.FragmentNasaDetailsBinding
 import com.example.nasa.viewmodel.NASADetailsViewModel
@@ -41,6 +44,9 @@ class NASADetailsFragment : Fragment() {
     ): View {
         binding = FragmentNasaDetailsBinding.inflate(inflater, container, false)
         initRecyclerView()
+        binding.likeButton.setOnClickListener {
+            addToLiked()
+        }
         viewModel.nasaModel().observe(viewLifecycleOwner){ nasaModel ->
             Glide.with(binding.nasaDetailImage.context)
                 .load(nasaModel?.imageUrl)
@@ -50,9 +56,24 @@ class NASADetailsFragment : Fragment() {
             binding.tvDescription.text = nasaModel?.description
 
             viewModel.loadComments(nasaModel.nasaId)
+            viewModel.loadIsLikedState(nasaModel.nasaId)
         }
+
         viewModel.nasaComments().observe(viewLifecycleOwner) {
             adapter?.submitList(it)
+        }
+        viewModel.isPostLiked().observe(viewLifecycleOwner){
+            when (it){
+                null -> binding.likeButton.isVisible = false
+                true -> {
+                    binding.likeButton.isVisible = true
+                    binding.likeButton.setImageDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.heart))
+                }
+                false -> {
+                    binding.likeButton.isVisible = true
+                    binding.likeButton.setImageDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.heart_outline))
+                }
+            }
         }
         return binding.root
     }
@@ -65,6 +86,10 @@ class NASADetailsFragment : Fragment() {
 
     private val onCommentPost = { comment: String ->
         viewModel.postComment(comment)
+    }
+
+    private fun addToLiked(){
+        viewModel.executeLikeButton()
     }
 
     override fun onStop() {

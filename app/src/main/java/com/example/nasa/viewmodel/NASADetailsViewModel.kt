@@ -10,13 +10,13 @@ import com.example.domain.models.firebase.Comment
 import com.example.domain.models.firebase.NASAPostCommentsModel
 import com.example.domain.payload.NewCommentRequest
 import com.example.domain.usecases.backend.GetSingleNasaItemUseCase
-import com.example.domain.usecases.firebase.LoadCommentsUseCase
-import com.example.domain.usecases.firebase.PostNewCommentUseCase
+import com.example.domain.usecases.firebase.*
 import com.example.nasa.adapter.commentsection.CommentInputItem
 import com.example.nasa.adapter.commentsection.CommentsSectionItem
 import com.example.nasa.adapter.commentsection.NoSignedUserAlertItem
 import com.example.nasa.mapper.asCommentsSectionItem
 import com.example.nasa.rx.SchedulersProvider
+import com.example.nasa.viewstate.NASADetailsViewState
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -36,6 +36,9 @@ class NASADetailsViewModel @Inject constructor(
     private val loadCommentsUseCase: LoadCommentsUseCase,
     private val postNewCommentUseCase: PostNewCommentUseCase,
     private val getSingleNasaItemUseCase: GetSingleNasaItemUseCase,
+    private val addPostToLikedUseCase: AddPostToLikedUseCase,
+    private val deletePostFromLikedUseCase: DeletePostFromLikedUseCase,
+    private val loadPostLikedStatusUseCase: LoadPostLikedStatusUseCase,
     private val schedulers: SchedulersProvider
 ) : ViewModel() {
 
@@ -47,21 +50,44 @@ class NASADetailsViewModel @Inject constructor(
     private val nasaModel = MutableLiveData<NASAImageModel>()
     fun nasaModel(): LiveData<NASAImageModel> = nasaModel
 
+    private val isPostLiked = MutableLiveData<Boolean?>()
+    fun isPostLiked(): LiveData<Boolean?> = isPostLiked
+
     private val disposables = mutableListOf<Disposable>()
 
+    private var likeStatusCheckDisposable: Disposable? = null
+
     fun loadNasaPost(nasaId: String) {
-        disposables.add(getSingleNasaItemUseCase.execute(nasaId)
-            .subscribeOn(schedulers.io())
-            .observeOn(schedulers.ui())
-            .subscribe({
-                nasaModel.value = it
-            },{
-                throw IllegalArgumentException("No such nasa id found")
-            }))
+        disposables.add(
+            getSingleNasaItemUseCase.execute(nasaId)
+                .subscribeOn(schedulers.io())
+                .observeOn(schedulers.ui())
+                .subscribe({
+                    nasaModel.value = it
+                }, {
+                    throw IllegalArgumentException("No such nasa id found")
+                })
+        )
+    }
+
+    fun loadIsLikedState(nasaId: String){
+        if(Firebase.auth.currentUser != null){
+            disposables.add(loadPostLikedStatusUseCase.execute(nasaId)
+                .subscribeOn(schedulers.io())
+                .observeOn(schedulers.ui())
+                .subscribe({
+                    isPostLiked.value = it
+                },{
+                    Log.e(TAG, "Unable to load liked status")
+                }))
+        }else {
+            isPostLiked.value = null
+        }
     }
 
     fun setNasaModel(model: NASAImageModel) {
         nasaModel.value = model
+        loadIsLikedState(model.nasaId)
     }
 
     fun loadComments(nasaId: String) {
@@ -101,14 +127,51 @@ class NASADetailsViewModel @Inject constructor(
         nasaModel.value?.nasaId?.let { nasaId ->
             val postCommentRequest =
                 NewCommentRequest(commentId.toString(), nasaId, comment)
-            disposables.add(postNewCommentUseCase.execute(postCommentRequest)
-                .subscribeOn(schedulers.io())
-                .observeOn(schedulers.ui())
-                .subscribe())
+            disposables.add(
+                postNewCommentUseCase.execute(postCommentRequest)
+                    .subscribeOn(schedulers.io())
+                    .observeOn(schedulers.ui())
+                    .subscribe()
+            )
         }
     }
 
     fun cancelAllDisposables() {
         disposables.forEach { it.dispose() }
+        likeStatusCheckDisposable?.dispose()
+    }
+
+    fun executeLikeButton() {
+        nasaModel.value?.let {
+            if(isPostLiked.value == false) {
+                addToLiked(it)
+            }else{
+                removeFromLiked(it.nasaId)
+            }
+        }
+    }
+
+    private fun addToLiked(model: NASAImageModel){
+        likeStatusCheckDisposable?.dispose()
+        likeStatusCheckDisposable = addPostToLikedUseCase.execute(model)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe({
+                isPostLiked.value = true
+            }, {
+
+            })
+    }
+
+    private fun removeFromLiked(id: String){
+        likeStatusCheckDisposable?.dispose()
+        likeStatusCheckDisposable = deletePostFromLikedUseCase.execute(id)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe({
+                isPostLiked.value = false
+            }, {
+
+            })
     }
 }

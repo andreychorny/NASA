@@ -3,12 +3,10 @@ package com.example.data.repository
 import android.util.Log
 import com.example.domain.models.firebase.User
 import com.example.domain.repositories.AuthenticationRepository
-import com.example.domain.repositories.FirebaseCommentRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import io.reactivex.Completable
 import io.reactivex.CompletableEmitter
 import javax.inject.Inject
