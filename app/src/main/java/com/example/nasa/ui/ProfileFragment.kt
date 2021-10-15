@@ -9,11 +9,10 @@ import com.example.nasa.databinding.FragmentProfileBinding
 import com.example.nasa.navigator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import androidx.activity.result.contract.ActivityResultContracts
 import android.graphics.Bitmap
+import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
@@ -21,6 +20,7 @@ import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.example.nasa.R
 import com.example.nasa.viewmodel.ProfileViewModel
+import com.example.nasa.viewmodel.SharedProfileViewModel
 import com.example.nasa.viewstate.ProfileViewState
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -31,9 +31,9 @@ class ProfileFragment : Fragment() {
 
     private val viewModel by viewModels<ProfileViewModel>()
 
-    private lateinit var auth: FirebaseAuth
+    private val sharedViewModel by viewModels<SharedProfileViewModel>({ requireParentFragment() })
 
-    private lateinit var database: DatabaseReference
+    private lateinit var auth: FirebaseAuth
 
     private val onUploadImage =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -67,7 +67,6 @@ class ProfileFragment : Fragment() {
     ): View {
         binding = FragmentProfileBinding.inflate(inflater, container, false)
         if(auth.uid == null) this.navigator().goBack()
-        database = Firebase.database.reference
         binding.tvNickname.text = Firebase.auth.currentUser?.displayName
         binding.btnSignOut.setOnClickListener {
             Firebase.auth.signOut()
@@ -76,8 +75,12 @@ class ProfileFragment : Fragment() {
         binding.ivEditImage.setOnClickListener {
             onUploadImage.launch("image/*")
         }
+        sharedViewModel.userActivities().observe(viewLifecycleOwner){
+            Log.e("!!!", "!!!")
+            binding.tvAmountOfLikedPosts.text = it.likedPosts?.size.toString()
+        }
         setViewStatesProcessing()
-        viewModel.loadCurrentUser(auth.uid!!)
+        viewModel.loadProfilePicture()
         return binding.root
     }
 

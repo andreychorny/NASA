@@ -74,7 +74,7 @@ class MainActivity @Inject constructor() : AppCompatActivity(), Navigator {
     }
 
     override fun goToProfileScreen() {
-        launchFragment(ProfileFragment.newInstance())
+        launchFragment(ProfilePageFragment.newInstance())
     }
 
 }

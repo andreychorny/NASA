@@ -28,9 +28,9 @@ class FirebasePostRepositoryImpl @Inject constructor(
 
     override fun addPostToLiked(nasaPost: NASAPost): Completable  = Completable.create{ subscriber ->
         val userNickname = Firebase.auth.currentUser?.displayName
-        if(userNickname != null){
-            val reference = database.child("userToLikedPosts").child(userNickname)
-                .child(nasaPost.nasaId)
+        if(userNickname != null && (nasaPost.nasaId != null)){
+            val reference = database.child("user-activities").child(userNickname)
+                .child("likedPosts").child(nasaPost.nasaId!!)
             reference.setValue(nasaPost).addOnSuccessListener {
                 subscriber.onComplete()
             }.addOnFailureListener{
@@ -42,8 +42,8 @@ class FirebasePostRepositoryImpl @Inject constructor(
     override fun deletePostFromLiked(nasaId: String): Completable = Completable.create{ subscriber ->
         val userNickname = Firebase.auth.currentUser?.displayName
         if(userNickname != null){
-            val reference = database.child("userToLikedPosts").child(userNickname)
-                .child(nasaId)
+            val reference = database.child("user-activities").child(userNickname)
+                .child("likedPosts").child(nasaId)
             reference.removeValue().addOnSuccessListener {
                 subscriber.onComplete()
             }.addOnFailureListener{
@@ -55,8 +55,8 @@ class FirebasePostRepositoryImpl @Inject constructor(
     override fun getLikedStatus(nasaId: String): Single<Boolean> = Single.create{ subscriber ->
         val userNickname = Firebase.auth.currentUser?.displayName
         if(userNickname != null){
-            val reference = database.child("userToLikedPosts").child(userNickname)
-                .child(nasaId)
+            val reference = database.child("user-activities").child(userNickname)
+                .child("likedPosts").child(nasaId)
             reference.get().addOnSuccessListener {
                 if(it.exists()) {
                     subscriber.onSuccess(true)

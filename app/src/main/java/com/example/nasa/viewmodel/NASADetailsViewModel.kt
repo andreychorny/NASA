@@ -6,29 +6,22 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.domain.models.backend.NASAImageModel
-import com.example.domain.models.firebase.Comment
 import com.example.domain.models.firebase.NASAPostCommentsModel
 import com.example.domain.payload.NewCommentRequest
 import com.example.domain.usecases.backend.GetSingleNasaItemUseCase
 import com.example.domain.usecases.firebase.*
+import com.example.domain.usecases.firebase.comment.LoadCommentsUseCase
+import com.example.domain.usecases.firebase.comment.PostNewCommentUseCase
 import com.example.nasa.adapter.commentsection.CommentInputItem
 import com.example.nasa.adapter.commentsection.CommentsSectionItem
 import com.example.nasa.adapter.commentsection.NoSignedUserAlertItem
 import com.example.nasa.mapper.asCommentsSectionItem
 import com.example.nasa.rx.SchedulersProvider
-import com.example.nasa.viewstate.NASADetailsViewState
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.Disposable
 import java.lang.IllegalArgumentException
-import java.text.DateFormat
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel

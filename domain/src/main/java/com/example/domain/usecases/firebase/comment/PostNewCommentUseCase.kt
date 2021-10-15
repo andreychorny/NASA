@@ -1,4 +1,4 @@
-package com.example.domain.usecases.firebase
+package com.example.domain.usecases.firebase.comment
 
 import com.example.domain.payload.NewCommentRequest
 import com.example.domain.repositories.FirebasePostRepository

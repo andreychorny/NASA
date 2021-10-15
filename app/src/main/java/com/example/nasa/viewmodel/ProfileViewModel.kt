@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.domain.models.firebase.User
+import com.example.domain.models.firebase.UserActivities
+import com.example.domain.usecases.firebase.GetUserActivitiesUseCase
 import com.example.domain.usecases.firebase.GetUserUseCase
 import com.example.domain.usecases.firebase.UploadProfilePictureUseCase
 import com.example.nasa.rx.SchedulersProvider
@@ -25,34 +27,17 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val uploadProfilePictureUseCase: UploadProfilePictureUseCase,
-    private val getUserUseCase: GetUserUseCase,
     private val schedulers: SchedulersProvider
 ) : ViewModel() {
 
     private val profileState = MutableLiveData<ProfileViewState>()
     fun profileState(): LiveData<ProfileViewState> = profileState
 
-    private var currentUser: User? = null
-
     private val storage = Firebase.storage.reference
 
     private val disposables = mutableListOf<Disposable>()
 
-    fun loadCurrentUser(uid: String) {
-        //TODO retrieve friendlist from this
-        disposables.add(getUserUseCase.execute(uid)
-            .subscribeOn(schedulers.io())
-            .observeOn(schedulers.ui())
-            .subscribe({
-                currentUser = it
-            }, {
-
-            })
-        )
-        loadProfilePicture()
-    }
-
-    private fun loadProfilePicture() {
+    fun loadProfilePicture() {
         //TODO consider whether pass this logic to repository
         profileState.value = ProfileViewState.LoadingProfilePhoto
         val imgLink = storage.child("users/${Firebase.auth.currentUser?.displayName}.jpg")

@@ -2,6 +2,7 @@ package com.example.data.repository
 
 import android.graphics.Bitmap
 import com.example.domain.models.firebase.User
+import com.example.domain.models.firebase.UserActivities
 import com.example.domain.repositories.FirebaseUserRepository
 import com.example.domain.repositories.RemoteSearchRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -23,6 +24,12 @@ class FirebaseUserRepositoryImpl @Inject constructor(
     override fun getCurrentUserByUid(uid: String): Single<User> = Single.create { subscriber ->
         database.child("users").child(uid).get().addOnSuccessListener {
             it.getValue<User>()?.let { user -> subscriber.onSuccess(user) }
+        }
+    }
+
+    override fun getUserActivities(nickname: String): Single<UserActivities> = Single.create{ subscriber ->
+        database.child("user-activities").child(nickname).get().addOnSuccessListener {
+            it.getValue<UserActivities>()?.let { user -> subscriber.onSuccess(user) }
         }
     }
 
