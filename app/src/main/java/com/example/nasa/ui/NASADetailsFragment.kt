@@ -13,6 +13,7 @@ import com.example.domain.models.backend.NASAImageModel
 import com.example.nasa.R
 import com.example.nasa.adapter.commentsection.CommentsSectionAdapter
 import com.example.nasa.databinding.FragmentNasaDetailsBinding
+import com.example.nasa.navigator
 import com.example.nasa.viewmodel.NASADetailsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.IllegalArgumentException
@@ -79,13 +80,17 @@ class NASADetailsFragment : Fragment() {
     }
 
     private fun initRecyclerView() {
-        adapter = CommentsSectionAdapter(onCommentPost)
+        adapter = CommentsSectionAdapter(onCommentPost, onUserProfileClicked)
         binding.commentSectionRecyclerView.adapter = adapter
 
     }
 
     private val onCommentPost = { comment: String ->
         viewModel.postComment(comment)
+    }
+
+    private val onUserProfileClicked = { username: String ->
+        navigator().goToProfileScreen(username)
     }
 
     private fun addToLiked(){
@@ -106,6 +111,14 @@ class NASADetailsFragment : Fragment() {
         fun newInstance(model: NASAImageModel): NASADetailsFragment {
             val args = Bundle()
             args.putParcelable(MODEL, model)
+            val fragment = NASADetailsFragment()
+            fragment.arguments = args
+            return fragment
+        }
+
+        fun newInstance(nasaDetailsId: String): NASADetailsFragment {
+            val args = Bundle()
+            args.putString(KEY, nasaDetailsId)
             val fragment = NASADetailsFragment()
             fragment.arguments = args
             return fragment

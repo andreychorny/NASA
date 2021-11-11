@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import com.example.nasa.adapter.SearchAdapter
 import com.example.nasa.adapter.profile.LikedPostsAdapter
 import com.example.nasa.databinding.FragmentLikedPostsBinding
+import com.example.nasa.navigator
 import com.example.nasa.viewmodel.SharedProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -27,12 +28,16 @@ class LikedPostsFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentLikedPostsBinding.inflate(inflater, container, false)
-        adapter = LikedPostsAdapter()
+        adapter = LikedPostsAdapter(onGoToDetails)
         binding.rvLikedPosts.adapter = adapter
         sharedViewModel.userActivities().observe(viewLifecycleOwner){
             adapter?.submitList(it.likedPosts?.values?.toList())
         }
         return binding.root
+    }
+
+    private val onGoToDetails = {nasaId: String ->
+        navigator().goToDetailsPage(nasaId)
     }
 
     companion object {

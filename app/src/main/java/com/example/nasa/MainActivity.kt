@@ -65,16 +65,20 @@ class MainActivity @Inject constructor() : AppCompatActivity(), Navigator {
         launchFragment(NASADetailsFragment.newInstance(model))
     }
 
+    override fun goToDetailsPage(nasaId: String) {
+        launchFragment(NASADetailsFragment.newInstance(nasaId))
+    }
+
     override fun goToAuthenticationScreen() {
         if(auth.currentUser != null){
-            goToProfileScreen()
+            goToProfileScreen(auth.currentUser?.displayName!!)
         }else {
             launchFragment(AuthenticationFragment.newInstance())
         }
     }
 
-    override fun goToProfileScreen() {
-        launchFragment(ProfilePageFragment.newInstance())
+    override fun goToProfileScreen(username: String) {
+        launchFragment(ProfilePageFragment.newInstance(username))
     }
 
 }

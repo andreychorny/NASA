@@ -25,7 +25,7 @@ import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor(
+class PersonalProfileViewModel @Inject constructor(
     private val uploadProfilePictureUseCase: UploadProfilePictureUseCase,
     private val schedulers: SchedulersProvider
 ) : ViewModel() {

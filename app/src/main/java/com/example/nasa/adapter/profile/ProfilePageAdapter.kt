@@ -6,10 +6,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.example.nasa.ui.LikedPostsFragment
-import com.example.nasa.ui.ProfileFragment
+import com.example.nasa.ui.OthersProfileFragment
+import com.example.nasa.ui.PersonalProfileFragment
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
 import java.lang.IllegalArgumentException
 
-class ProfilePageAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm,
+class ProfilePageAdapter(val username: String, fm: FragmentManager) : FragmentPagerAdapter(fm,
     BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     companion object {
@@ -26,7 +29,13 @@ class ProfilePageAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm,
 
     override fun getItem(position: Int): Fragment {
         return when(position){
-            0 ->  ProfileFragment.newInstance()
+            0 ->  {
+                if(FirebaseAuth.getInstance().currentUser?.displayName == username){
+                    PersonalProfileFragment.newInstance()
+                }else{
+                    OthersProfileFragment.newInstance(username)
+                }
+            }
             1 ->  LikedPostsFragment.newInstance()
             else -> throw IllegalArgumentException("No such fragment")
         }

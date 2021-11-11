@@ -5,31 +5,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.nasa.databinding.FragmentProfileBinding
 import com.example.nasa.navigator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import androidx.activity.result.contract.ActivityResultContracts
 import android.graphics.Bitmap
-import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.example.nasa.R
-import com.example.nasa.viewmodel.ProfileViewModel
+import com.example.nasa.databinding.FragmentPersonalProfileBinding
+import com.example.nasa.viewmodel.PersonalProfileViewModel
 import com.example.nasa.viewmodel.SharedProfileViewModel
 import com.example.nasa.viewstate.ProfileViewState
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ProfileFragment : Fragment() {
+class PersonalProfileFragment : Fragment() {
 
-    private lateinit var binding: FragmentProfileBinding
+    private lateinit var binding: FragmentPersonalProfileBinding
 
-    private val viewModel by viewModels<ProfileViewModel>()
+    private val viewModel by viewModels<PersonalProfileViewModel>()
 
     private val sharedViewModel by viewModels<SharedProfileViewModel>({ requireParentFragment() })
 
@@ -65,7 +64,7 @@ class ProfileFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentProfileBinding.inflate(inflater, container, false)
+        binding = FragmentPersonalProfileBinding.inflate(inflater, container, false)
         if(auth.uid == null) this.navigator().goBack()
         binding.tvNickname.text = Firebase.auth.currentUser?.displayName
         binding.btnSignOut.setOnClickListener {
@@ -76,7 +75,6 @@ class ProfileFragment : Fragment() {
             onUploadImage.launch("image/*")
         }
         sharedViewModel.userActivities().observe(viewLifecycleOwner){
-            Log.e("!!!", "!!!")
             binding.tvAmountOfLikedPosts.text = it.likedPosts?.size.toString()
         }
         setViewStatesProcessing()
@@ -120,8 +118,8 @@ class ProfileFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(): ProfileFragment {
-            return ProfileFragment()
+        fun newInstance(): PersonalProfileFragment {
+            return PersonalProfileFragment()
         }
     }
 }

@@ -12,14 +12,17 @@ private const val ITEM_TYPE_COMMENT = 1
 private const val ITEM_TYPE_COMMENT_INPUT = 2
 private const val ITEM_TYPE_NO_SIGNED_USER_ALERT = 3
 
-class CommentsSectionAdapter(private val onCommentPost: (comment: String) -> Unit) :
+class CommentsSectionAdapter(
+    private val onCommentPost: (comment: String) -> Unit,
+    private val onUserProfileClicked: (username: String) -> Unit
+) :
     ListAdapter<CommentsSectionItem, RecyclerView.ViewHolder>(CommentsSectionDiffUtil()) {
 
     private val storage = Firebase.storage.reference
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            ITEM_TYPE_COMMENT -> CommentViewHolder.from(parent, storage)
+            ITEM_TYPE_COMMENT -> CommentViewHolder.from(parent, storage, onUserProfileClicked)
             ITEM_TYPE_COMMENT_INPUT -> CommentInputViewHolder.from(parent, onCommentPost)
             ITEM_TYPE_NO_SIGNED_USER_ALERT -> NoSignedUserAlertViewHolder.from(parent)
             else -> throw IllegalStateException()

@@ -5,10 +5,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.domain.models.firebase.NASAPost
 
-class LikedPostsAdapter() : ListAdapter<NASAPost, NASAPostViewHolder>((NASAPostDiffUtil())) {
+class LikedPostsAdapter(
+    private val onGoToDetails: (nasaId: String) -> Unit
+) : ListAdapter<NASAPost, NASAPostViewHolder>((NASAPostDiffUtil())) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NASAPostViewHolder {
-        return NASAPostViewHolder.from(parent)
+        return NASAPostViewHolder.from(parent, onGoToDetails)
     }
 
     override fun onBindViewHolder(holder: NASAPostViewHolder, position: Int) {

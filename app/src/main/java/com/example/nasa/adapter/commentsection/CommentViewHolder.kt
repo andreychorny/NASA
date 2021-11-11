@@ -11,8 +11,9 @@ import com.google.firebase.storage.StorageReference
 
 class CommentViewHolder(
     view: View,
-    private val storage: StorageReference
-): RecyclerView.ViewHolder(view) {
+    private val storage: StorageReference,
+    private val onUserProfileClicked: (username: String) -> Unit
+) : RecyclerView.ViewHolder(view) {
 
     private val binding = ItemCommentBinding.bind(itemView)
 
@@ -20,12 +21,15 @@ class CommentViewHolder(
         binding.tvSenderNickname.text = item.senderNickname
         binding.tvDatePosted.text = item.dateWritten
         binding.tvCommentText.text = item.text
-
+        binding.clSenderProfile.setOnClickListener{
+            onUserProfileClicked(item.senderNickname)
+        }
 //        GlideApp.with(binding.ivSenderProfileImg).load(Any()).placeholderDrawable
         //TODO That's bad, consider how to improve
         //TODO cache storage reference by Glide
         val profilePath = storage.child("users/${item.senderNickname}.jpg")
-        GlideApp.with(binding.ivSenderProfileImg).load(profilePath).placeholder(R.drawable.ic_baseline_person_24).into(binding.ivSenderProfileImg)
+        GlideApp.with(binding.ivSenderProfileImg).load(profilePath)
+            .placeholder(R.drawable.ic_baseline_person_24).into(binding.ivSenderProfileImg)
 //        val imgLink = Firebase.storage.reference.child("users/${item.senderNickname}.jpg")
 //        imgLink.getBytes(Long.MAX_VALUE).addOnSuccessListener {
 //            val profilePhoto = BitmapFactory.decodeByteArray(it, 0, it.size)
@@ -34,11 +38,14 @@ class CommentViewHolder(
     }
 
     companion object {
-        fun from(parent: ViewGroup, storage: StorageReference): CommentViewHolder {
+        fun from(
+            parent: ViewGroup, storage: StorageReference,
+            onUserProfileClicked: (username: String) -> Unit
+        ): CommentViewHolder {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_comment, parent, false)
 
-            return CommentViewHolder(view, storage)
+            return CommentViewHolder(view, storage, onUserProfileClicked)
         }
     }
 

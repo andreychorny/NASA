@@ -22,7 +22,9 @@ interface Navigator {
 
     fun goToDetailsPage(model: NASAImageModel)
 
+    fun goToDetailsPage(nasaId: String)
+
     fun goToAuthenticationScreen()
 
-    fun goToProfileScreen()
+    fun goToProfileScreen(username: String)
 }
