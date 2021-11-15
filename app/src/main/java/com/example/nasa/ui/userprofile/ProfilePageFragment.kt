@@ -1,21 +1,15 @@
-package com.example.nasa.ui
+package com.example.nasa.ui.userprofile
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.domain.models.backend.NASAImageModel
 import com.example.nasa.adapter.profile.ProfilePageAdapter
 import com.example.nasa.databinding.FragmentProfilePageBinding
 import com.example.nasa.viewmodel.SharedProfileViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
-import java.lang.IllegalArgumentException
 
 @AndroidEntryPoint
 class ProfilePageFragment : Fragment() {

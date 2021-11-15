@@ -30,11 +30,6 @@ class CommentViewHolder(
         val profilePath = storage.child("users/${item.senderNickname}.jpg")
         GlideApp.with(binding.ivSenderProfileImg).load(profilePath)
             .placeholder(R.drawable.ic_baseline_person_24).into(binding.ivSenderProfileImg)
-//        val imgLink = Firebase.storage.reference.child("users/${item.senderNickname}.jpg")
-//        imgLink.getBytes(Long.MAX_VALUE).addOnSuccessListener {
-//            val profilePhoto = BitmapFactory.decodeByteArray(it, 0, it.size)
-//            Glide.with(binding.ivSenderProfileImg).load(profilePhoto).into(binding.ivSenderProfileImg)
-//        }
     }
 
     companion object {

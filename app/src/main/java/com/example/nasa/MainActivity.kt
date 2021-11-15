@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import com.example.domain.models.backend.NASAImageModel
 import com.example.nasa.databinding.ActivityMainBinding
 import com.example.nasa.ui.*
+import com.example.nasa.ui.userprofile.ProfilePageFragment
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

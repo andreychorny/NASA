@@ -15,10 +15,12 @@
         <entry key="..\:/Users/Andrii_Chornyi/AndroidStudioProjects/NASA/app/src/main/res/layout/fragment_profile.xml" value="0.176" />
         <entry key="..\:/Users/Andrii_Chornyi/AndroidStudioProjects/NASA/app/src/main/res/layout/fragment_profile_page.xml" value="0.13125" />
         <entry key="..\:/Users/Andrii_Chornyi/AndroidStudioProjects/NASA/app/src/main/res/layout/fragment_search_result.xml" value="0.24365942028985507" />
+        <entry key="..\:/Users/Andrii_Chornyi/AndroidStudioProjects/NASA/app/src/main/res/layout/fragment_subscriptions.xml" value="0.20380434782608695" />
         <entry key="..\:/Users/Andrii_Chornyi/AndroidStudioProjects/NASA/app/src/main/res/layout/item_comment.xml" value="0.264" />
         <entry key="..\:/Users/Andrii_Chornyi/AndroidStudioProjects/NASA/app/src/main/res/layout/item_comment_input.xml" value="0.264" />
         <entry key="..\:/Users/Andrii_Chornyi/AndroidStudioProjects/NASA/app/src/main/res/layout/item_nasa_image.xml" value="0.24365942028985507" />
         <entry key="..\:/Users/Andrii_Chornyi/AndroidStudioProjects/NASA/app/src/main/res/layout/item_no_signed_user_alert.xml" value="0.13020833333333334" />
+        <entry key="..\:/Users/Andrii_Chornyi/AndroidStudioProjects/NASA/app/src/main/res/layout/item_subscription_user.xml" value="0.20380434782608695" />
         <entry key="..\:/Users/Andrii_Chornyi/AndroidStudioProjects/NASA/app/src/main/res/menu/top_app_bar.xml" value="0.11979166666666667" />
         <entry key="..\:/Users/Andrii_Chornyi/AndroidStudioProjects/NASA/domain/src/main/res/layout/activity_main.xml" value="0.13020833333333334" />
       </map>

@@ -4,6 +4,9 @@ import android.graphics.BitmapFactory
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.domain.usecases.firebase.SubscribeToUserUseCase
+import com.example.domain.usecases.firebase.UnsubscribeFromUserUseCase
+import com.example.nasa.rx.SchedulersProvider
 import com.example.nasa.viewstate.ProfileViewState
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -13,6 +16,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OthersProfileViewModel @Inject constructor(
+    private val subscribeToUserUseCase: SubscribeToUserUseCase,
+    private val unsubscribeFromUserUseCase: UnsubscribeFromUserUseCase,
+    private val schedulers: SchedulersProvider
 ) : ViewModel() {
 
     private val profileState = MutableLiveData<ProfileViewState>()
@@ -31,5 +37,28 @@ class OthersProfileViewModel @Inject constructor(
         }.addOnFailureListener {
             profileState.value = ProfileViewState.ProfileDefaultImg
         }
+    }
+
+    fun subscribeToUser(username: String){
+        subscribeToUserUseCase.execute(username)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe({
+
+            }, {
+
+            })
+    }
+
+    fun unsubscribeFromUser(username: String){
+        unsubscribeFromUserUseCase.execute(username)
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .subscribe({
+
+            }, {
+
+            })
+
     }
 }

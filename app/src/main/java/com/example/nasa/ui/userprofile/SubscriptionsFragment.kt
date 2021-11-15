@@ -1,4 +1,4 @@
-package com.example.nasa.ui
+package com.example.nasa.ui.userprofile
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,43 +6,40 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.nasa.adapter.SearchAdapter
 import com.example.nasa.adapter.profile.LikedPostsAdapter
+import com.example.nasa.adapter.profile.SubscriptionsAdapter
 import com.example.nasa.databinding.FragmentLikedPostsBinding
-import com.example.nasa.navigator
+import com.example.nasa.databinding.FragmentSubscriptionsBinding
 import com.example.nasa.viewmodel.SharedProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class LikedPostsFragment: Fragment() {
+class SubscriptionsFragment: Fragment() {
 
-    private lateinit var binding: FragmentLikedPostsBinding
+    private lateinit var binding: FragmentSubscriptionsBinding
 
     private val sharedViewModel by viewModels<SharedProfileViewModel>({ requireParentFragment() })
 
-    private var adapter: LikedPostsAdapter? = null
+    private var adapter: SubscriptionsAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentLikedPostsBinding.inflate(inflater, container, false)
-        adapter = LikedPostsAdapter(onGoToDetails)
-        binding.rvLikedPosts.adapter = adapter
+        binding = FragmentSubscriptionsBinding.inflate(inflater, container, false)
+        adapter = SubscriptionsAdapter()
+        binding.rvSubscriptions.adapter = adapter
         sharedViewModel.userActivities().observe(viewLifecycleOwner){
-            adapter?.submitList(it.likedPosts?.values?.toList())
+            adapter?.submitList(it.subscriptions?.keys?.toList())
         }
         return binding.root
     }
 
-    private val onGoToDetails = {nasaId: String ->
-        navigator().goToDetailsPage(nasaId)
-    }
-
     companion object {
-        fun newInstance(): LikedPostsFragment {
-            return LikedPostsFragment()
+        fun newInstance(): SubscriptionsFragment {
+            return SubscriptionsFragment()
         }
     }
+
 }
