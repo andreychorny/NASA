@@ -20,6 +20,7 @@ import com.example.nasa.rx.SchedulersProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
@@ -46,7 +47,7 @@ class NASADetailsViewModel @Inject constructor(
     private val isPostLiked = MutableLiveData<Boolean?>()
     fun isPostLiked(): LiveData<Boolean?> = isPostLiked
 
-    private val disposables = mutableListOf<Disposable>()
+    private val disposables = CompositeDisposable()
 
     private var likeStatusCheckDisposable: Disposable? = null
 
@@ -130,7 +131,7 @@ class NASADetailsViewModel @Inject constructor(
     }
 
     fun cancelAllDisposables() {
-        disposables.forEach { it.dispose() }
+        disposables.dispose()
         likeStatusCheckDisposable?.dispose()
     }
 

@@ -7,6 +7,7 @@ import com.example.domain.usecases.backend.GetSearchListUseCase
 import com.example.nasa.rx.SchedulersProvider
 import com.example.nasa.viewstate.SearchResultViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
@@ -19,7 +20,7 @@ class SearchResultViewModel @Inject constructor(
     private val searchResult = MutableLiveData<SearchResultViewState>()
     fun searchResult(): LiveData<SearchResultViewState> = searchResult
 
-    private val disposables = mutableListOf<Disposable>()
+    private val disposables = CompositeDisposable()
 
     fun makeSearch(query: String) {
         searchResult.value = SearchResultViewState.Loading
@@ -35,6 +36,6 @@ class SearchResultViewModel @Inject constructor(
     }
 
     fun cancelAllDisposables() {
-        disposables.forEach { it.dispose() }
+        disposables.dispose()
     }
 }

@@ -12,6 +12,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +27,7 @@ class OthersProfileViewModel @Inject constructor(
     fun profileState(): LiveData<ProfileViewState> = profileState
 
     private val storage = Firebase.storage.reference
+    private val disposables = CompositeDisposable()
 
     fun loadProfilePicture(username: String) {
         //TODO consider whether pass this logic to repository
@@ -40,25 +42,20 @@ class OthersProfileViewModel @Inject constructor(
     }
 
     fun subscribeToUser(username: String){
-        subscribeToUserUseCase.execute(username)
+        disposables.add(subscribeToUserUseCase.execute(username)
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
-            .subscribe({
-
-            }, {
-
-            })
+            .subscribe({}, {}))
     }
 
     fun unsubscribeFromUser(username: String){
-        unsubscribeFromUserUseCase.execute(username)
+        disposables.add(unsubscribeFromUserUseCase.execute(username)
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
-            .subscribe({
+            .subscribe({}, {}))
+    }
 
-            }, {
-
-            })
-
+    fun cancelAllDisposables() {
+        disposables.dispose()
     }
 }

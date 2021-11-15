@@ -8,6 +8,7 @@ import com.example.domain.models.firebase.UserActivities
 import com.example.domain.usecases.firebase.GetUserActivitiesUseCase
 import com.example.nasa.rx.SchedulersProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
@@ -19,7 +20,7 @@ class SharedProfileViewModel @Inject constructor(
 
     private val userActivities = MutableLiveData<UserActivities>()
     fun userActivities(): LiveData<UserActivities> = userActivities
-    private val disposables = mutableListOf<Disposable>()
+    private val disposables = CompositeDisposable()
 
     fun loadUserActivities(nickname: String){
         disposables.add(getUserActivitiesUseCase.execute(nickname)
@@ -33,6 +34,6 @@ class SharedProfileViewModel @Inject constructor(
     }
 
     fun cancelAllDisposables() {
-        disposables.forEach { it.dispose() }
+        disposables.dispose()
     }
 }

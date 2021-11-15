@@ -20,6 +20,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
@@ -35,7 +36,7 @@ class PersonalProfileViewModel @Inject constructor(
 
     private val storage = Firebase.storage.reference
 
-    private val disposables = mutableListOf<Disposable>()
+    private val disposables = CompositeDisposable()
 
     fun loadProfilePicture() {
         //TODO consider whether pass this logic to repository
@@ -63,6 +64,6 @@ class PersonalProfileViewModel @Inject constructor(
     }
 
     fun cancelAllDisposables() {
-        disposables.forEach { it.dispose() }
+        disposables.dispose()
     }
 }

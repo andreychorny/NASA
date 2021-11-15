@@ -101,6 +101,11 @@ class OthersProfileFragment : Fragment() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        viewModel.cancelAllDisposables()
+    }
+
     companion object {
 
         @JvmStatic

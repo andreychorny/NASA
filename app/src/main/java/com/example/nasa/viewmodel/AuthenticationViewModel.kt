@@ -11,6 +11,7 @@ import com.example.domain.usecases.firebase.authentication.SignUpUserUseCase
 import com.example.nasa.rx.SchedulersProvider
 import com.example.nasa.viewstate.AuthenticationViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
@@ -25,7 +26,7 @@ class AuthenticationViewModel @Inject constructor(
     private val authenticationState = MutableLiveData<AuthenticationViewState>()
     fun authenticationState(): LiveData<AuthenticationViewState> = authenticationState
 
-    private val disposables = mutableListOf<Disposable>()
+    private val disposables = CompositeDisposable()
 
     fun signInUser(email: String, password: String) {
         authenticationState.value = AuthenticationViewState.Loading
@@ -61,6 +62,6 @@ class AuthenticationViewModel @Inject constructor(
     }
 
     fun cancelAllDisposables() {
-        disposables.forEach { it.dispose() }
+        disposables.dispose()
     }
 }
